@@ -40,6 +40,7 @@ Flutter + SQLite 기반으로 제작되었습니다.
 
 ## 📂 Project Structure
 
+```
 dvwa_mobile/
 ├─ lib/
 │ ├─ main.dart
@@ -57,6 +58,7 @@ dvwa_mobile/
 │ ├─ banner.png
 │ └─ user_guide.pdf
 └─ README.md
+```
 
 ---
 
