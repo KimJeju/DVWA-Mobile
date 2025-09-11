@@ -13,7 +13,7 @@ class _LoginPageState extends State<LoginPage> {
   final _id = TextEditingController(text: '');
   final _pw = TextEditingController(text: '');
 
-  String _status = 'Try default: admin / admin';
+  String _status = 'Please Try Login';
 
   @override
   void dispose() {
@@ -26,31 +26,44 @@ class _LoginPageState extends State<LoginPage> {
   Future<bool> _vulnLogin(String u, String p) async {
     final db = await AppDB.instance();
     final sql = "SELECT * FROM users WHERE username='$u' AND password='$p'";
-    final rows = await db.rawQuery(sql);
-    return rows.isNotEmpty;
+    debugPrint('[SQL] $sql');         
+    // ignore: prefer_typing_uninitialized_variables
+    var rows;
+    try{
+     rows = await db.rawQuery(sql);
+     return rows.isNotEmpty;
+    }catch(e){
+      print(e);
+    }
+    return rows.isEmpty;
   }
 
   Future<void> _onLogin() async {
     final ok = await _vulnLogin(_id.text, _pw.text);
-    if (!mounted) return;
-    if (ok) {
-      setState(() => _status = 'Login success ✅');
-      Navigator.of(
+    try{
+        if (!mounted) return;
+        if (ok) {
+          setState(() => _status = 'Login success ✅');
+          Navigator.of(
         context,
-      ).pushReplacement(MaterialPageRoute(builder: (_) => const BoardPage()));
-    } else {
-      setState(() => _status = 'Login failed ❌  (hint: SQLi)');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Login failed")));
+          ).pushReplacement(MaterialPageRoute(builder: (_) => const BoardPage()));
+        } else {
+          setState(() => _status = 'Login failed ❌  (hint: SQLi)');
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text("Login failed")));
+        } 
+    }catch(e){
+      print(e);
     }
+  
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('DVWA Mobile — Login (SQLi)')),
+      appBar: AppBar(title: const Text('DVWA Mobile — Login')),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
@@ -65,7 +78,6 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _id,
                   decoration: const InputDecoration(
                     labelText: 'Username',
-                    hintText: "e.g. admin  |  or  ' OR '1'='1",
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -75,7 +87,6 @@ class _LoginPageState extends State<LoginPage> {
                   obscureText: true,
                   decoration: const InputDecoration(
                     labelText: 'Password',
-                    hintText: 'e.g. admin (ignored by SQLi payload)',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -98,9 +109,9 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const SelectableText(
-                    "💡 SQLi Bypass 예시\n"
-                    "username: ' OR '1'='1\n"
-                    "password: (아무 값이나)\n\n"
+                    "💡 SQLi Bypass 예시 : \n"
+                    "■ username: ' OR '1'='1\n"
+                    "■ password: (아무 값이나)\n\n"
                     "⚠️ 이 앱은 교육/연구용 취약 환경입니다.",
                   ),
                 ),
