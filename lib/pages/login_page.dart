@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
     }catch(e){
       print(e);
     }
-    return rows.isEmpty;
+    return false;
   }
 
   Future<void> _onLogin() async {
